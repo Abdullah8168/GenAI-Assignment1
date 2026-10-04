@@ -10,4 +10,6 @@ pandas>=2.0
 matplotlib>=3.8
 pillow>=10.0
 numpy>=1.26
+huggingface_hub>=0.23   # fast Oxford-IIIT Pet mirror (timm/oxford-iiit-pet)
+pyarrow>=14
 # backend / app dependencies are in backend/requirements.txt and frontend/package.json

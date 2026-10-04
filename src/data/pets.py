@@ -20,15 +20,45 @@ CLS2ID = {c: i for i, c in enumerate(K.CLASSES)}
 
 
 # ----------------------------------------------------------------------------- raw images
-def _pets_root():
-    """Return a folder containing images/ and annotations/ (download if needed)."""
+def _resize(im):
+    return np.asarray(im.convert("RGB").resize((C.IMG, C.IMG), Image.BICUBIC))
+
+
+def _local_root():
+    """A folder with the official images/ and annotations/ (manual download or Kaggle input)."""
     candidates = [os.environ.get("PETS_ROOT"), C.DATA / "oxford-iiit-pet", "/kaggle/input/oxford-iiit-pet"]
     for c in candidates:
         if c and (Path(c) / "annotations" / "trainval.txt").exists():
             return Path(c)
-    from torchvision.datasets import OxfordIIITPet  # downloads ~800 MB from robots.ox.ac.uk
+    return None
+
+
+def _from_local(root, split):
+    names = [l.split()[0] for l in open(root / "annotations" / f"{split}.txt") if l.strip()]
+    return {n: _resize(Image.open(root / "images" / f"{n}.jpg")) for n in names}
+
+
+def _from_hf(split):
+    """Hugging Face mirror timm/oxford-iiit-pet (fast CDN). Its 'train' split is the official
+    trainval list (3,680 images) and 'test' the official test list; image_id keeps the
+    original file name, e.g. 'Abyssinian_100'."""
+    import io
+    import pyarrow.parquet as pq
+    from huggingface_hub import hf_hub_download
+    hf_split = "train" if split == "trainval" else "test"
+    path = hf_hub_download("timm/oxford-iiit-pet", f"data/{hf_split}-00000-of-00001.parquet",
+                           repo_type="dataset", cache_dir=str(C.DATA / "hf"))
+    out = {}
+    for batch in pq.ParquetFile(path).iter_batches(batch_size=256, columns=["image", "image_id"]):
+        for img, name in zip(batch.column("image").to_pylist(), batch.column("image_id").to_pylist()):
+            out[name] = _resize(Image.open(io.BytesIO(img["bytes"])))
+    return out
+
+
+def _from_torchvision(split):
+    from torchvision.datasets import OxfordIIITPet  # slow: robots.ox.ac.uk (~800 MB)
     OxfordIIITPet(root=str(C.DATA), split="trainval", download=True)
-    return C.DATA / "oxford-iiit-pet"
+    return _from_local(C.DATA / "oxford-iiit-pet", split)
 
 
 def _synthetic(n, seed):
@@ -47,14 +77,22 @@ def load_split_images(split):
     cache = C.DATA / f"pets_{split}_{C.IMG}.npy"
     if cache.exists():
         return np.load(cache)
-    root = _pets_root()
-    names = [l.split()[0] for l in open(root / "annotations" / f"{split}.txt") if l.strip()]
-    arr = np.zeros((len(names), C.IMG, C.IMG, 3), np.uint8)
-    for i, n in enumerate(names):
-        im = Image.open(root / "images" / f"{n}.jpg").convert("RGB").resize((C.IMG, C.IMG), Image.BICUBIC)
-        arr[i] = np.asarray(im)
+    root = _local_root()
+    if root is not None:
+        images = _from_local(root, split)
+    else:
+        try:
+            images = _from_hf(split)
+        except Exception as e:
+            print(f"[pets] Hugging Face mirror failed ({e}); falling back to robots.ox.ac.uk")
+            images = _from_torchvision(split)
+    # sort by official file name so every source gives the same order (and hence the same split)
+    names = sorted(images)
+    arr = np.stack([images[n] for n in names])
+    print(f"[pets] {split}: {len(names)} images")
     cache.parent.mkdir(parents=True, exist_ok=True)
     np.save(cache, arr)
+    C.save_json(names, C.DATA / f"pets_{split}_names.json")
     return arr
 
 
