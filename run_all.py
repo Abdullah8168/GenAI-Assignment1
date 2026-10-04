@@ -19,10 +19,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--stages", nargs="+", default=STAGES, choices=STAGES)
     ap.add_argument("--zip", action="store_true", help="zip outputs/ at the end (for Kaggle download)")
+    ap.add_argument("--skip-done", action="store_true", help="skip stages already completed (resume after a disconnect)")
     a = ap.parse_args()
     print(f"profile={C.PROFILE} device={C.DEVICE} out={C.OUT} synthetic={C.SYNTHETIC}")
-    times = {}
+    done_file = C.out("tables", "stage_minutes.json")
+    times = C.load_json(done_file) if done_file.exists() else {}
     for s in a.stages:
+        if a.skip_done and s in times:
+            print(f"[{s}] already done ({times[s]} min) - skipped")
+            continue
         t = time.time()
         print(f"\n================ {s} ================")
         if s == "t1":
@@ -37,7 +42,7 @@ def main():
             from src import export_onnx as m
         m.run()
         times[s] = round((time.time() - t) / 60, 1)
-        C.save_json(times, C.out("tables", "stage_minutes.json"))
+        C.save_json(times, done_file)
         print(f"[{s}] done in {times[s]} min")
     if a.zip:
         shutil.make_archive(str(C.OUT.parent / "outputs"), "zip", C.OUT)
