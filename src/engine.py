@@ -22,8 +22,9 @@ from src.metrics import l1, psnr, ssim
 
 # ----------------------------------------------------------------------------- loaders
 def loader(ds, batch_size=None, shuffle=False, batch_sampler=None, drop_last=False):
-    kw = dict(num_workers=C.NUM_WORKERS, pin_memory=C.DEVICE.type == "cuda",
-              persistent_workers=C.NUM_WORKERS > 0)
+    # persistent_workers=False: workers exit after every pass. A new validation loader is built
+    # each epoch, and persistent workers from old loaders accumulated until Colab ran out of RAM.
+    kw = dict(num_workers=C.NUM_WORKERS, pin_memory=C.DEVICE.type == "cuda", persistent_workers=False)
     if batch_sampler is not None:
         return DataLoader(ds, batch_sampler=batch_sampler, **kw)
     drop_last = drop_last and len(ds) >= batch_size   # never produce an empty epoch
