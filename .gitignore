@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+data/
+outputs/
+outputs_smoke/
+*.zip
+*.onnx
+*.pt
+node_modules/
+frontend/dist/
+.DS_Store
