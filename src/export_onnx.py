@@ -92,39 +92,59 @@ def run():
         print("exported", p.name)
 
     norm01 = {"input_range": "[0,1] RGB float32 NCHW", "output_range": "[0,1]"}
-    m, hp = dae_from("universal_dae")
-    do("universal_dae", m, (x,), ["input"], ["output"], {**norm01, "hparams": hp})
+    have = lambda *names: all(C.out("checkpoints", f"{n}.pt").exists() for n in names)
+    skipped = []
 
-    ck = E.load_ckpt("classifier")
-    clf = CorruptionClassifier(base=ck["hparams"]["base"], dropout=ck["hparams"]["dropout"])
-    clf.load_state_dict(ck["state_dict"])
-    do("classifier", WithSoftmax(clf).eval(), (x,), ["input"], ["probabilities"],
-       {"input_range": "[0,1]", "classes": K.CLASSES, "hparams": ck["hparams"]})
+    if have('universal_dae'):
+        m, hp = dae_from("universal_dae")
+        do("universal_dae", m, (x,), ["input"], ["output"], {**norm01, "hparams": hp})
+    else:
+        skipped.append('universal_dae')
 
-    for cls in ["salt", "blur", "occlusion"]:
-        m, hp = dae_from(f"specialist_{cls}")
-        do(f"specialist_{cls}", m, (x,), ["input"], ["output"], {**norm01, "hparams": hp})
+    if have('classifier'):
+        ck = E.load_ckpt("classifier")
+        clf = CorruptionClassifier(base=ck["hparams"]["base"], dropout=ck["hparams"]["dropout"])
+        clf.load_state_dict(ck["state_dict"])
+        do("classifier", WithSoftmax(clf).eval(), (x,), ["input"], ["probabilities"],
+           {"input_range": "[0,1]", "classes": K.CLASSES, "hparams": ck["hparams"]})
+    else:
+        skipped.append('classifier')
 
-    ck = E.load_ckpt("soft_moe")
-    sd = ck["state_dict"]
-    gate = CorruptionClassifier(base=sd["gate.features.0.0.weight"].shape[0])
-    sp = E.load_ckpt("specialist_salt")["hparams"]
-    experts = [DenoisingAE(base=sp["base"], z_ch=sp["z_ch"]) for _ in range(3)]
-    moe = SoftMoE(gate, *experts, tau=ck["hparams"]["tau"])
-    moe.load_state_dict(sd)
-    do("soft_moe", moe.eval(), (x,), ["input"], ["output", "weights", "logits", "branches"],
-       {**norm01, "temperature": float(ck["hparams"]["tau"]),
-        "branches": ["clean(identity)", "salt", "blur", "occlusion"], "hparams": ck["hparams"]})
+    if have('specialist_salt', 'specialist_blur', 'specialist_occlusion'):
+        for cls in ["salt", "blur", "occlusion"]:
+            m, hp = dae_from(f"specialist_{cls}")
+            do(f"specialist_{cls}", m, (x,), ["input"], ["output"], {**norm01, "hparams": hp})
+    else:
+        skipped.append('specialist_salt')
 
-    ck = E.load_ckpt("sketch_generator")
-    hp = ck["hparams"]
-    G = UNetGenerator(hp["base"], hp["emb_dim"], hp["dropout"])
-    G.load_state_dict(ck["state_dict"])
-    photo = x * 2 - 1
-    style = torch.tensor([i % 3 for i in range(len(photo))], dtype=torch.long)
-    do("sketch_generator", G.eval(), (photo, style), ["photo", "style"], ["sketch"],
-       {"input_range": "photo [-1,1] RGB NCHW; style int64 in {0,1,2}", "output_range": "[-1,1]",
-        "hparams": hp})
+    if have('soft_moe', 'specialist_salt'):
+        ck = E.load_ckpt("soft_moe")
+        sd = ck["state_dict"]
+        gate = CorruptionClassifier(base=sd["gate.features.0.0.weight"].shape[0])
+        sp = E.load_ckpt("specialist_salt")["hparams"]
+        experts = [DenoisingAE(base=sp["base"], z_ch=sp["z_ch"]) for _ in range(3)]
+        moe = SoftMoE(gate, *experts, tau=ck["hparams"]["tau"])
+        moe.load_state_dict(sd)
+        do("soft_moe", moe.eval(), (x,), ["input"], ["output", "weights", "logits", "branches"],
+           {**norm01, "temperature": float(ck["hparams"]["tau"]),
+            "branches": ["clean(identity)", "salt", "blur", "occlusion"], "hparams": ck["hparams"]})
+    else:
+        skipped.append('soft_moe')
+
+    if have('sketch_generator'):
+        ck = E.load_ckpt("sketch_generator")
+        hp = ck["hparams"]
+        G = UNetGenerator(hp["base"], hp["emb_dim"], hp["dropout"])
+        G.load_state_dict(ck["state_dict"])
+        photo = x * 2 - 1
+        style = torch.tensor([i % 3 for i in range(len(photo))], dtype=torch.long)
+        do("sketch_generator", G.eval(), (photo, style), ["photo", "style"], ["sketch"],
+           {"input_range": "photo [-1,1] RGB NCHW; style int64 in {0,1,2}", "output_range": "[-1,1]",
+            "hparams": hp})
+    else:
+        skipped.append('sketch_generator')
+    if skipped:
+        print("[export] not trained yet, skipped:", skipped)
 
     df = pd.DataFrame(rows)
     df.to_csv(C.out("tables", "onnx_verification.csv"), index=False)

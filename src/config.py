@@ -42,6 +42,15 @@ PROFILES = {
         t3_trials=8, t3_trial_warmup=1, t3_trial_epochs=2, t3_warmup=3, t3_epochs=15,
         t4_trials=8, t4_trial_epochs=12, t4_epochs=120, t4_sample_every=10,
     ),
+    # time-limited run: same searches for T1/T2 (already finished), shorter T2 retraining, T3 and T4
+    "fast": dict(
+        max_train=None, max_val=None, max_test=None,
+        t1_trials=12, t1_trial_epochs=5, t1_epochs=40, t1_ablation_epochs=15,
+        t2c_trials=10, t2c_trial_epochs=4, t2c_epochs=12,
+        t2s_trials=8, t2s_trial_epochs=4, t2s_epochs=12,
+        t3_trials=4, t3_trial_warmup=1, t3_trial_epochs=1, t3_warmup=1, t3_epochs=4,
+        t4_trials=4, t4_trial_epochs=4, t4_epochs=30, t4_sample_every=5,
+    ),
     "full": dict(
         max_train=None, max_val=None, max_test=None,
         t1_trials=25, t1_trial_epochs=8, t1_epochs=80, t1_ablation_epochs=30,
