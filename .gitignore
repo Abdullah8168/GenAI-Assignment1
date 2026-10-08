@@ -10,3 +10,4 @@ __pycache__/
 node_modules/
 frontend/dist/
 .DS_Store
+/outputs_smoketest_old/

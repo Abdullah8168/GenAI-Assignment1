@@ -1,0 +1,640 @@
+{
+  "health": {
+    "status": "ok",
+    "onnxruntime": "1.20.1",
+    "providers": [
+      "AzureExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "image_size": 128,
+    "uptime_s": 144.6,
+    "temperature": 2.678154091306088
+  },
+  "corrupt/salt/low": {
+    "corruption": {
+      "type": "salt",
+      "severity": "low",
+      "params": {
+        "p": 0.03,
+        "seed": 2029167940
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/salt/medium": {
+    "corruption": {
+      "type": "salt",
+      "severity": "medium",
+      "params": {
+        "p": 0.08,
+        "seed": 2029167940
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/salt/high": {
+    "corruption": {
+      "type": "salt",
+      "severity": "high",
+      "params": {
+        "p": 0.15,
+        "seed": 2029167940
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/blur/low": {
+    "corruption": {
+      "type": "blur",
+      "severity": "low",
+      "params": {
+        "k": 3,
+        "sigma": 0.7
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/blur/medium": {
+    "corruption": {
+      "type": "blur",
+      "severity": "medium",
+      "params": {
+        "k": 5,
+        "sigma": 1.5
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/blur/high": {
+    "corruption": {
+      "type": "blur",
+      "severity": "high",
+      "params": {
+        "k": 7,
+        "sigma": 2.5
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/occlusion/low": {
+    "corruption": {
+      "type": "occlusion",
+      "severity": "low",
+      "params": {
+        "rects": [
+          [
+            64,
+            21,
+            52,
+            32
+          ]
+        ],
+        "coverage": 0.1015625
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/occlusion/medium": {
+    "corruption": {
+      "type": "occlusion",
+      "severity": "medium",
+      "params": {
+        "rects": [
+          [
+            96,
+            41,
+            32,
+            36
+          ],
+          [
+            44,
+            48,
+            52,
+            41
+          ]
+        ],
+        "coverage": 0.200439453125
+      },
+      "seed": 7
+    }
+  },
+  "corrupt/occlusion/high": {
+    "corruption": {
+      "type": "occlusion",
+      "severity": "high",
+      "params": {
+        "rects": [
+          [
+            23,
+            86,
+            60,
+            42
+          ],
+          [
+            71,
+            12,
+            44,
+            53
+          ],
+          [
+            10,
+            4,
+            36,
+            25
+          ]
+        ],
+        "coverage": 0.35107421875
+      },
+      "seed": 7
+    }
+  },
+  "universal/clean": {
+    "metrics": {
+      "psnr_input": 99.0,
+      "psnr_output": 21.178882697128515,
+      "ssim_input": 1.0,
+      "ssim_output": 0.7243759036064148
+    },
+    "corruption": {
+      "type": "clean",
+      "severity": "none",
+      "params": {},
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 13.19
+    },
+    "model": "universal_dae.onnx"
+  },
+  "hard/clean": {
+    "metrics": {
+      "psnr_input": 99.0,
+      "psnr_output": 99.0,
+      "ssim_input": 1.0,
+      "ssim_output": 1.0
+    },
+    "corruption": {
+      "type": "clean",
+      "severity": "none",
+      "params": {},
+      "seed": 7
+    },
+    "inference_ms": {
+      "classifier": 9.92,
+      "expert": 0.0,
+      "total": 9.92
+    },
+    "predicted": "clean",
+    "expert": "identity",
+    "mode": "predicted",
+    "probabilities": {
+      "clean": 0.9936521053314209,
+      "salt": 6.315529753919691e-05,
+      "blur": 0.004628914408385754,
+      "occlusion": 0.0016558553325012326
+    },
+    "model": "classifier.onnx + specialist_*.onnx"
+  },
+  "soft/clean": {
+    "metrics": {
+      "psnr_input": 99.0,
+      "psnr_output": 42.67274283394684,
+      "ssim_input": 1.0,
+      "ssim_output": 0.997429609298706
+    },
+    "corruption": {
+      "type": "clean",
+      "severity": "none",
+      "params": {},
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 85.36
+    },
+    "weights": {
+      "clean": 0.885195255279541,
+      "salt": 0.011693790555000305,
+      "blur": 0.05336352437734604,
+      "occlusion": 0.04974742606282234
+    },
+    "dominant": "clean",
+    "temperature": 2.678154091306088,
+    "model": "soft_moe.onnx"
+  },
+  "universal/salt": {
+    "metrics": {
+      "psnr_input": 12.910896067672088,
+      "psnr_output": 21.096699556104,
+      "ssim_input": 0.1785304993391037,
+      "ssim_output": 0.7028334140777588
+    },
+    "corruption": {
+      "type": "salt",
+      "severity": "high",
+      "params": {
+        "p": 0.15,
+        "seed": 2029167940
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 28.37
+    },
+    "model": "universal_dae.onnx"
+  },
+  "hard/salt": {
+    "metrics": {
+      "psnr_input": 12.910896067672088,
+      "psnr_output": 24.447059993064588,
+      "ssim_input": 0.1785304993391037,
+      "ssim_output": 0.7762919068336487
+    },
+    "corruption": {
+      "type": "salt",
+      "severity": "high",
+      "params": {
+        "p": 0.15,
+        "seed": 2029167940
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "classifier": 9.98,
+      "expert": 34.9,
+      "total": 44.88
+    },
+    "predicted": "salt",
+    "expert": "salt",
+    "mode": "predicted",
+    "probabilities": {
+      "clean": 0.00014430655573960394,
+      "salt": 0.999789297580719,
+      "blur": 3.532336268108338e-05,
+      "occlusion": 3.108245073235594e-05
+    },
+    "model": "classifier.onnx + specialist_*.onnx"
+  },
+  "soft/salt": {
+    "metrics": {
+      "psnr_input": 12.910896067672088,
+      "psnr_output": 24.523487596208668,
+      "ssim_input": 0.1785304993391037,
+      "ssim_output": 0.7789764404296875
+    },
+    "corruption": {
+      "type": "salt",
+      "severity": "high",
+      "params": {
+        "p": 0.15,
+        "seed": 2029167940
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 82.62
+    },
+    "weights": {
+      "clean": 0.010127115063369274,
+      "salt": 0.976637601852417,
+      "blur": 0.0077230134047567844,
+      "occlusion": 0.005512238014489412
+    },
+    "dominant": "salt",
+    "temperature": 2.678154091306088,
+    "model": "soft_moe.onnx"
+  },
+  "universal/blur": {
+    "metrics": {
+      "psnr_input": 26.31736527952104,
+      "psnr_output": 21.04856541116167,
+      "ssim_input": 0.7504097819328308,
+      "ssim_output": 0.6871700286865234
+    },
+    "corruption": {
+      "type": "blur",
+      "severity": "high",
+      "params": {
+        "k": 7,
+        "sigma": 2.5
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 11.32
+    },
+    "model": "universal_dae.onnx"
+  },
+  "hard/blur": {
+    "metrics": {
+      "psnr_input": 26.31736527952104,
+      "psnr_output": 24.60353982215374,
+      "ssim_input": 0.7504097819328308,
+      "ssim_output": 0.7711987495422363
+    },
+    "corruption": {
+      "type": "blur",
+      "severity": "high",
+      "params": {
+        "k": 7,
+        "sigma": 2.5
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "classifier": 11.08,
+      "expert": 39.32,
+      "total": 50.4
+    },
+    "predicted": "blur",
+    "expert": "blur",
+    "mode": "predicted",
+    "probabilities": {
+      "clean": 0.0019687588792294264,
+      "salt": 4.037173766846536e-06,
+      "blur": 0.9980126619338989,
+      "occlusion": 1.455393066862598e-05
+    },
+    "model": "classifier.onnx + specialist_*.onnx"
+  },
+  "soft/blur": {
+    "metrics": {
+      "psnr_input": 26.31736527952104,
+      "psnr_output": 25.384557861727373,
+      "ssim_input": 0.7504097819328308,
+      "ssim_output": 0.7791919112205505
+    },
+    "corruption": {
+      "type": "blur",
+      "severity": "high",
+      "params": {
+        "k": 7,
+        "sigma": 2.5
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 169.39
+    },
+    "weights": {
+      "clean": 0.16247674822807312,
+      "salt": 0.01688033528625965,
+      "blur": 0.7945030331611633,
+      "occlusion": 0.02613992989063263
+    },
+    "dominant": "blur",
+    "temperature": 2.678154091306088,
+    "model": "soft_moe.onnx"
+  },
+  "universal/occlusion": {
+    "metrics": {
+      "psnr_input": 8.676174820447384,
+      "psnr_output": 19.35285324561222,
+      "ssim_input": 0.5655871033668518,
+      "ssim_output": 0.6067009568214417
+    },
+    "corruption": {
+      "type": "occlusion",
+      "severity": "high",
+      "params": {
+        "rects": [
+          [
+            23,
+            86,
+            60,
+            42
+          ],
+          [
+            71,
+            12,
+            44,
+            53
+          ],
+          [
+            10,
+            4,
+            36,
+            25
+          ]
+        ],
+        "coverage": 0.35107421875
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 10.91
+    },
+    "model": "universal_dae.onnx"
+  },
+  "hard/occlusion": {
+    "metrics": {
+      "psnr_input": 8.676174820447384,
+      "psnr_output": 19.53916058023325,
+      "ssim_input": 0.5655871033668518,
+      "ssim_output": 0.6421535611152649
+    },
+    "corruption": {
+      "type": "occlusion",
+      "severity": "high",
+      "params": {
+        "rects": [
+          [
+            23,
+            86,
+            60,
+            42
+          ],
+          [
+            71,
+            12,
+            44,
+            53
+          ],
+          [
+            10,
+            4,
+            36,
+            25
+          ]
+        ],
+        "coverage": 0.35107421875
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "classifier": 5.23,
+      "expert": 35.26,
+      "total": 40.49
+    },
+    "predicted": "occlusion",
+    "expert": "occlusion",
+    "mode": "predicted",
+    "probabilities": {
+      "clean": 1.2282410331854177e-12,
+      "salt": 7.668422341566838e-08,
+      "blur": 1.2162033533047456e-11,
+      "occlusion": 0.9999998807907104
+    },
+    "model": "classifier.onnx + specialist_*.onnx"
+  },
+  "soft/occlusion": {
+    "metrics": {
+      "psnr_input": 8.676174820447384,
+      "psnr_output": 19.536977186755077,
+      "ssim_input": 0.5655871033668518,
+      "ssim_output": 0.6421651244163513
+    },
+    "corruption": {
+      "type": "occlusion",
+      "severity": "high",
+      "params": {
+        "rects": [
+          [
+            23,
+            86,
+            60,
+            42
+          ],
+          [
+            71,
+            12,
+            44,
+            53
+          ],
+          [
+            10,
+            4,
+            36,
+            25
+          ]
+        ],
+        "coverage": 0.35107421875
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "total": 143.7
+    },
+    "weights": {
+      "clean": 1.955909829121083e-05,
+      "salt": 0.0017885626293718815,
+      "blur": 6.445198960136622e-05,
+      "occlusion": 0.9981274008750916
+    },
+    "dominant": "occlusion",
+    "temperature": 2.678154091306088,
+    "model": "soft_moe.onnx"
+  },
+  "hard/blur-low/oracle": {
+    "metrics": {
+      "psnr_input": 34.663460548241936,
+      "psnr_output": 24.249659564260234,
+      "ssim_input": 0.9626939296722412,
+      "ssim_output": 0.7839946746826172
+    },
+    "corruption": {
+      "type": "blur",
+      "severity": "low",
+      "params": {
+        "k": 3,
+        "sigma": 0.7
+      },
+      "seed": 7
+    },
+    "inference_ms": {
+      "classifier": 5.77,
+      "expert": 32.28,
+      "total": 38.06
+    },
+    "predicted": "blur",
+    "expert": "blur",
+    "mode": "oracle",
+    "probabilities": {
+      "clean": 0.0029065378475934267,
+      "salt": 7.738447493466083e-06,
+      "blur": 0.9970598816871643,
+      "occlusion": 2.5845081836450845e-05
+    },
+    "model": "classifier.onnx + specialist_*.onnx"
+  },
+  "universal/uploaded-corrupted": {
+    "metrics": null,
+    "corruption": null,
+    "inference_ms": {
+      "total": 11.6
+    },
+    "model": "universal_dae.onnx"
+  },
+  "hard/uploaded-corrupted": {
+    "metrics": null,
+    "corruption": null,
+    "inference_ms": {
+      "classifier": 5.78,
+      "expert": 37.55,
+      "total": 43.32
+    },
+    "predicted": "salt",
+    "expert": "salt",
+    "mode": "predicted",
+    "probabilities": {
+      "clean": 0.00014430655573960394,
+      "salt": 0.999789297580719,
+      "blur": 3.532336268108338e-05,
+      "occlusion": 3.108245073235594e-05
+    },
+    "model": "classifier.onnx + specialist_*.onnx"
+  },
+  "soft/uploaded-corrupted": {
+    "metrics": null,
+    "corruption": null,
+    "inference_ms": {
+      "total": 73.17
+    },
+    "weights": {
+      "clean": 0.010127115063369274,
+      "salt": 0.976637601852417,
+      "blur": 0.0077230134047567844,
+      "occlusion": 0.005512238014489412
+    },
+    "dominant": "salt",
+    "temperature": 2.678154091306088,
+    "model": "soft_moe.onnx"
+  },
+  "sketch/style1": {
+    "inference_ms": {
+      "total": 21.75
+    },
+    "style": 1,
+    "model": "sketch_generator.onnx"
+  },
+  "sketch/style2": {
+    "inference_ms": {
+      "total": 23.16
+    },
+    "style": 2,
+    "model": "sketch_generator.onnx"
+  },
+  "sketch/style3": {
+    "inference_ms": {
+      "total": 23.66
+    },
+    "style": 3,
+    "model": "sketch_generator.onnx"
+  },
+  "validation/bad-file": {
+    "http_error": 415,
+    "detail": "Unsupported or corrupted image file (use PNG, JPEG, WEBP or BMP)."
+  },
+  "mlflow_runs_per_experiment": {
+    "task4_sketch_cgan_final": 1,
+    "task4_sketch_cgan_optuna": 2,
+    "task3_soft_moe_final": 1,
+    "task3_soft_moe_optuna": 4,
+    "task2_specialists_final": 2,
+    "task2_specialists_optuna": 8,
+    "task2_classifier_final": 2,
+    "task2_classifier_optuna": 10,
+    "task1_universal_dae_final": 2,
+    "task1_universal_dae_optuna": 12,
+    "Default": 0
+  }
+}
